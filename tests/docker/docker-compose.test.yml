@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # 测试数据库
+  test-postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: test_db
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-test-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d test_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 测试Redis
+  test-redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - test_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # 测试后端API
+  test-backend:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://test_user:test_password@test-postgres:5432/test_db
+      REDIS_URL: redis://test-redis:6379/0
+      SECRET_KEY: test_secret_key_for_integration_tests
+      ENVIRONMENT: test
+      LOG_LEVEL: INFO
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-sk-test-key}
+    depends_on:
+      test-postgres:
+        condition: service_healthy
+      test-redis:
+        condition: service_healthy
+    ports:
+      - "8001:8000"
+    volumes:
+      - ../../backend:/app
+      - test_backend_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 测试前端
+  test-frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile.test
+    environment:
+      VITE_API_BASE_URL: http://test-backend:8000/api
+      NODE_ENV: test
+    depends_on:
+      - test-backend
+    ports:
+      - "3001:80"
+    volumes:
+      - ../../frontend:/app
+      - test_frontend_dist:/app/dist
+
+  # E2E测试运行器
+  e2e-runner:
+    build:
+      context: ../e2e
+      dockerfile: Dockerfile.e2e
+    environment:
+      E2E_BASE_URL: http://test-frontend
+      API_BASE_URL: http://test-backend:8000
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+    depends_on:
+      test-frontend:
+        condition: service_started
+      test-backend:
+        condition: service_healthy
+    volumes:
+      - ../e2e:/app
+      - e2e_test_results:/app/test-results
+      - e2e_screenshots:/app/screenshots
+    profiles:
+      - e2e
+
+volumes:
+  test_postgres_data:
+  test_redis_data:
+  test_backend_logs:
+  test_frontend_dist:
+  e2e_test_results:
+  e2e_screenshots:
