@@ -17,15 +17,13 @@ const initApp = async () => {
   const { useAuthStore } = await import('@/stores/auth')
   const authStore = useAuthStore()
   
-  // 如果有存储的token，尝试初始化用户信息
-  if (authStore.token) {
-    try {
-      await authStore.initialize()
-    } catch (error) {
-      console.error('初始化认证状态失败:', error)
-      // 清除无效的认证信息
-      authStore.clearAuth()
-    }
+  // 尝试初始化用户信息
+  try {
+    await authStore.initialize()
+  } catch (error) {
+    console.error('初始化认证状态失败:', error)
+    // 清除无效的认证信息
+    authStore.clearAuth()
   }
 }
 

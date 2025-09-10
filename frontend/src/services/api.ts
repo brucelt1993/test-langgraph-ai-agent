@@ -5,6 +5,7 @@ import axios, {
   type InternalAxiosRequestConfig 
 } from 'axios'
 import { ref, type Ref } from 'vue'
+import { config } from '@/config/env'
 
 // API响应类型
 interface ApiResponse<T = any> {
@@ -53,7 +54,7 @@ class ApiClient {
     }
   }
 
-  constructor(baseURL: string = '/api') {
+  constructor(baseURL: string = config.API_BASE_URL) {
     this.client = axios.create({
       baseURL,
       timeout: 30000,

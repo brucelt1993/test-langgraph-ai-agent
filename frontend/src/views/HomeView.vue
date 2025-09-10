@@ -1,10 +1,5 @@
 <template>
   <div class="min-h-screen bg-background">
-    <!-- 调试信息 -->
-    <div class="p-4 bg-green-100 text-green-800">
-      <p>Debug: HomeView组件已加载</p>
-      <p>认证状态: {{ authStore.isAuthenticated ? '已登录' : '未登录' }}</p>
-    </div>
     
     <!-- 头部导航 -->
     <header class="border-b border-border bg-card">

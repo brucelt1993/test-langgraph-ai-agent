@@ -128,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { RouterLink } from 'vue-router'
 import { EyeIcon, EyeOffIcon } from 'lucide-vue-next'
@@ -221,6 +221,9 @@ const handleSubmit = async () => {
     
     // 跳转到原来的页面或首页
     const redirectTo = route.query.redirect as string || '/'
+    
+    // 确保状态更新后再跳转
+    await nextTick()
     await router.push(redirectTo)
     
   } catch (error: any) {

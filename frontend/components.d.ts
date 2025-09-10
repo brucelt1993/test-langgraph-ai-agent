@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AuthDebug: typeof import('./src/components/AuthDebug.vue')['default']
     AuthGuard: typeof import('./src/components/AuthGuard.vue')['default']
     InputArea: typeof import('./src/components/InputArea.vue')['default']
     MessageList: typeof import('./src/components/MessageList.vue')['default']

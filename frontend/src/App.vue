@@ -1,23 +1,24 @@
 <template>
   <div id="app" class="min-h-screen bg-white">
-    <!-- 调试信息 -->
-    <div class="p-4 bg-red-100 text-red-800">
-      <p>Debug: App组件已加载</p>
-      <p>当前路由: {{ $route.path }}</p>
-    </div>
-    
     <RouterView />
     
     <!-- 通知容器暂时禁用
     <NotificationContainer />
     -->
+    
+    <!-- 调试组件 -->
+    <AuthDebug v-if="isDevelopment" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
+import AuthDebug from '@/components/AuthDebug.vue'
 // import NotificationContainer from '@/components/ui/NotificationContainer.vue'
+
+// 检查是否为开发环境
+const isDevelopment = computed(() => import.meta.env.DEV)
 
 // 初始化主题
 onMounted(() => {

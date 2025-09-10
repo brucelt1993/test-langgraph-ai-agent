@@ -5,11 +5,14 @@ export interface User {
   email: string
   full_name?: string
   is_active: boolean
-  role: string
+  is_verified: boolean
+  role: {
+    name: string
+    display_name: string
+    permissions?: string[]
+  }
   created_at: string
-  updated_at: string
-  last_login?: string
-  metadata?: Record<string, any>
+  last_login_at?: string
 }
 
 export interface LoginRequest {
@@ -26,6 +29,7 @@ export interface RegisterRequest {
 
 export interface LoginResponse {
   access_token: string
+  refresh_token: string
   token_type: string
   expires_in: number
   user: User

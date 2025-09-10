@@ -251,6 +251,21 @@ class Role(Base):
                 self.permissions = json.dumps(perms)
         except (json.JSONDecodeError, TypeError):
             pass
+    
+    def to_dict(self) -> dict:
+        """Convert role to dictionary for API responses."""
+        import json
+        try:
+            perms = json.loads(self.permissions)
+        except (json.JSONDecodeError, TypeError):
+            perms = []
+        
+        return {
+            "id": self.id,
+            "name": self.name,
+            "display_name": self.display_name,
+            "permissions": perms
+        }
 
 
 class UserSession(Base):

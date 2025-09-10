@@ -10,11 +10,17 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoading = ref(false)
 
   // 计算属性
-  const isAuthenticated = computed(() => !!token.value && !!user.value)
+  const isAuthenticated = computed(() => {
+    return !!token.value && !!user.value
+  })
 
   // 初始化
   const initialize = async () => {
-    if (token.value) {
+    const savedToken = localStorage.getItem('token')
+    if (savedToken) {
+      token.value = savedToken
+      apiClient.setAuthToken(savedToken)
+      
       try {
         const userData = await apiClient.get('/auth/me')
         user.value = userData

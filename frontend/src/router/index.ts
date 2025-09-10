@@ -112,6 +112,15 @@ router.beforeEach(async (to, from, next) => {
   const { useAuthStore } = await import('@/stores/auth')
   const authStore = useAuthStore()
 
+  // 等待认证状态初始化完成（如果需要）
+  if (authStore.token && !authStore.user) {
+    try {
+      await authStore.initialize()
+    } catch (error) {
+      console.error('路由守卫：认证状态初始化失败', error)
+    }
+  }
+
   // 需要认证的路由
   if (to.meta?.requiresAuth) {
     if (!authStore.isAuthenticated) {

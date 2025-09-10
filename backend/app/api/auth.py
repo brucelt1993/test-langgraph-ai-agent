@@ -23,6 +23,28 @@ router = APIRouter()
 
 
 # Request/Response models
+class UserResponse(BaseModel):
+    id: str
+    username: str
+    email: str
+    full_name: Optional[str]
+    is_active: bool
+    is_verified: bool
+    role: Dict[str, Any]
+    created_at: datetime
+    last_login_at: Optional[datetime]
+    
+    class Config:
+        from_attributes = True
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int  # seconds
+
+
 class UserRegisterRequest(BaseModel):
     username: str
     email: EmailStr
@@ -52,30 +74,16 @@ class UserLoginRequest(BaseModel):
     password: str
 
 
-class TokenResponse(BaseModel):
+class LoginResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
     expires_in: int  # seconds
+    user: UserResponse  # 添加用户信息
 
 
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
-
-
-class UserResponse(BaseModel):
-    id: str
-    username: str
-    email: str
-    full_name: Optional[str]
-    is_active: bool
-    is_verified: bool
-    role: Dict[str, Any]
-    created_at: datetime
-    last_login_at: Optional[datetime]
-    
-    class Config:
-        from_attributes = True
 
 
 class PasswordChangeRequest(BaseModel):
@@ -148,7 +156,7 @@ async def register(
         )
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login", response_model=LoginResponse)
 async def login(
     request: UserLoginRequest,
     http_request: Request
@@ -217,11 +225,25 @@ async def login(
             
             logger.info(f"User logged in: {user.username}")
             
-            return TokenResponse(
+            # 构造用户响应数据
+            user_response = UserResponse(
+                id=str(user.id),
+                username=user.username,
+                email=user.email,
+                full_name=user.full_name,
+                is_active=user.is_active,
+                is_verified=user.is_verified,
+                role=user.role.to_dict() if user.role else {"name": "user", "display_name": "用户"},
+                created_at=user.created_at,
+                last_login_at=user.last_login_at
+            )
+            
+            return LoginResponse(
                 access_token=tokens["access_token"],
                 refresh_token=tokens["refresh_token"],
                 token_type="bearer",
-                expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+                expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+                user=user_response
             )
             
     except HTTPException:

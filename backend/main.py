@@ -28,6 +28,9 @@ logging.basicConfig(
     ]
 )
 
+# Suppress watchfiles INFO logs
+logging.getLogger("watchfiles").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 
