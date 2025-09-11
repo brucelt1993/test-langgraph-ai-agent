@@ -17,11 +17,12 @@ from app.services.stream_service import (
     stream_connection
 )
 from app.services.chat_service import get_chat_service, ChatService
+from app.schemas.chat import MessageType
 import json
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/stream", tags=["streaming"])
+router = APIRouter(tags=["streaming"])
 
 
 @router.post("/connections")
@@ -431,7 +432,7 @@ async def stream_chat_response(
                     session_id=session_id,
                     user_id=current_user.id,
                     content=message_data.get("content", ""),
-                    message_type=DBMessageType.USER,
+                    message_type=MessageType.USER,
                     metadata=message_data.get("metadata")
                 ):
                     # 转换为流式消息格式

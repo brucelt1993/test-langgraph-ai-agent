@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, readonly } from 'vue'
 import { apiClient } from '@/services/api'
 import { streamService } from '@/services/stream'
 import type { 
@@ -249,6 +249,14 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  // 更新消息内容
+  const updateMessageContent = (messageId: string, content: string) => {
+    const messageIndex = messages.value.findIndex(msg => msg.id === messageId)
+    if (messageIndex >= 0) {
+      messages.value[messageIndex].content = content
+    }
+  }
+
   // 断开流式连接
   const disconnectStream = () => {
     if (streamConnection.value) {
@@ -287,6 +295,7 @@ export const useChatStore = defineStore('chat', () => {
     updateSession,
     deleteSession,
     getSessionStats,
+    updateMessageContent,
     disconnectStream,
     clearState
   }

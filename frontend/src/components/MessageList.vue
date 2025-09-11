@@ -1,9 +1,10 @@
 <template>
   <div 
     ref="messagesContainer"
-    class="flex-1 overflow-y-auto p-4 space-y-4"
+    class="flex-1 overflow-y-auto p-4"
     :class="containerClass"
   >
+    <div class="max-w-6xl mx-auto space-y-4">  <!-- 增加消息列表最大宽度 -->
     <!-- 加载更多历史消息 -->
     <div 
       v-if="canLoadMore && !isLoadingMore"
@@ -242,6 +243,7 @@
         </svg>
       </button>
     </div>
+    </div> <!-- 关闭max-w-6xl容器 -->
   </div>
 </template>
 
@@ -331,7 +333,7 @@ const getMessageContainerClass = (message: Message) => {
 
 // 获取消息气泡样式类
 const getMessageBubbleClass = (message: Message) => {
-  const baseClasses = ['message-bubble', 'max-w-[80%]']
+  const baseClasses = ['message-bubble', 'max-w-[85%]']
   
   switch (message.message_type) {
     case 'user':

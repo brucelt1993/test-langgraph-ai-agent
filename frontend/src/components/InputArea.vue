@@ -1,7 +1,7 @@
 <template>
   <div class="border-t border-border bg-background p-4">
     <!-- 输入区域主体 -->
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-6xl mx-auto">  <!-- 增加消息框最大宽度 -->
       <!-- 快捷操作栏 -->
       <div 
         v-if="showQuickActions"
